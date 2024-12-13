@@ -1,0 +1,34 @@
+steps:
+  - label: "Repo Sync"
+    agents:
+      queue: "default"
+    command:
+      - "cd /home/cvictor/AOSP/crDroid"  # Navigate to the crDroid source path
+      - "repo sync -j$(nproc)"          # Sync the repository using all available CPU cores
+
+  - label: "Build crDroid 15 - Device 1"
+    agents:
+      queue: "default"
+    command:
+      - "rm -rf /home/cvictor/AOSP/crDroid/out/target/product/oriole
+      - "cd /home/cvictor/AOSP/crDroid"
+      - "source build/envsetup.sh"
+      - "brunch oriole"              # Replace <device1> with the first device codename
+
+  - label: "Build crDroid 15 - Device 2"
+    agents:
+      queue: "default"
+    command:
+      - "rm -rf /home/cvictor/AOSP/crDroid/out/target/product/raven
+      - "cd /home/cvictor/AOSP/crDroid"
+      - "source build/envsetup.sh"
+      - "brunch raven"              # Replace <device2> with the second device codename
+
+  - label: "Build crDroid 15 - Device 3"
+    agents:
+      queue: "default"
+    command:
+      - "rm -rf /home/cvictor/AOSP/crDroid/out/target/product/bluejay
+      - "cd /home/cvictor/AOSP/crDroid"
+      - "source build/envsetup.sh"
+      - "brunch bluejay"              # Replace <device3> with the third device codename
