@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cdn.zenyhosting.cloud/sitemap.xml
+

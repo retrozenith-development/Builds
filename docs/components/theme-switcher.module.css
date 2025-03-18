@@ -1,0 +1,91 @@
+.themeSwitcher {
+  position: relative;
+  z-index: 10;
+}
+
+.themeButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.themeButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.themeMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.themeOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.themeOption:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.themeOption.active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.themeColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.amber {
+  background: linear-gradient(135deg, #e2703a, #f9ad6a);
+}
+
+.green {
+  background: linear-gradient(135deg, #00c853, #64ffda);
+}
+
+.blue {
+  background: linear-gradient(135deg, #2196f3, #80d8ff);
+}
+
+.purple {
+  background: linear-gradient(135deg, #7e57c2, #b39ddb);
+}
+
+.system {
+  background: linear-gradient(135deg, #ffc107, #ff5722);
+}
+
+.themeIcon {
+  width: 16px;
+  height: 16px;
+}
+
