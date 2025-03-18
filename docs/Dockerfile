@@ -23,8 +23,5 @@ EXPOSE 3000
 # Environment variables
 ENV NODE_ENV production
 
-# Install serve to run the built app
-RUN npm install -g serve
-
 # Start the app
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["pnpm", "start"]
