@@ -38,7 +38,7 @@ This repository is configured to automatically deploy to GitHub Pages when chang
 
 ### Deployment Process
 
-1. The GitHub Actions workflow in `.github/workflows/deploy.yml` handles the deployment process
+1. The GitHub Actions workflow in `/.github/workflows/deploy.yml` (located at the repository root) handles the deployment process
 2. It builds the site using Next.js static export
 3. The `public/CNAME` file ensures the custom domain is preserved
 

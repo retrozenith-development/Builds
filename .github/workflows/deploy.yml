@@ -1,9 +1,11 @@
-name: Deploy to GitHub Pages
+name: Deploy Website to GitHub Pages
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+    paths:
+      - 'docs/**'  # Only trigger when changes are made in the docs directory
+  workflow_dispatch:  # Allow manual triggering
 
 permissions:
   contents: read
@@ -46,21 +48,24 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       
       - name: Install dependencies
+        working-directory: ./docs
         run: pnpm install --frozen-lockfile
       
       - name: Build
+        working-directory: ./docs
         run: pnpm build
       
       - name: Setup Pages
         uses: actions/configure-pages@v3
       
       - name: Copy CNAME to output directory
+        working-directory: ./docs
         run: cp public/CNAME out/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./out
+          path: ./docs/out
 
   deploy:
     environment:
@@ -71,5 +76,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
-
+        uses: actions/deploy-pages@v2 
