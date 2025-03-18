@@ -29,6 +29,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Check Dockerfile location
+        run: |
+          ls -la docs/
+          # Ensure there's a file named exactly "Dockerfile" in the docs directory
+          if [ -f "docs/Dockerfile" ]; then
+            echo "Dockerfile exists in docs directory"
+          else
+            echo "Error: Dockerfile not found in docs directory"
+            exit 1
+          fi
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
@@ -55,7 +66,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./docs
+          context: .
+          file: docs/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
