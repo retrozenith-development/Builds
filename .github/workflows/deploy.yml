@@ -1,44 +1,54 @@
-name: Deploy Website to GitHub Pages
+name: Deploy Next.js to GitHub Pages
 
 on:
+  # Runs on pushes targeting the default branch
   push:
-    branches: [main]
+    branches: ["main"]
     paths:
       - 'docs/**'  # Only trigger when changes are made in the docs directory
-  workflow_dispatch:  # Allow manual triggering
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
+  # Build job
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-      
-      - name: Setup Node.js
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "18"
       
-      - name: Setup pnpm
+      - name: Setup PNPM
         uses: pnpm/action-setup@v2
         with:
           version: 8
           run_install: false
-      
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      
+
       - name: Setup pnpm cache
         uses: actions/cache@v3
         with:
@@ -46,134 +56,43 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-      
+
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            docs/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('docs/**.[jt]s', 'docs/**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
+
       - name: Install dependencies
         working-directory: ./docs
-        run: pnpm install --no-frozen-lockfile
-      
-      - name: Modify Next.js config for static export
-        working-directory: ./docs
-        run: |
-          # Make sure static export is properly configured
-          cat > custom-next.config.mjs << 'EOL'
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'export',
-  // Set the base path for the application when deployed to GitHub Pages
-  basePath: '',
-  // Set the asset prefix for the application using the custom domain
-  assetPrefix: 'https://cdn.zenyhosting.cloud',
-  // This is important for GitHub Pages
-  images: {
-    unoptimized: true,
-  },
-  // Trailing slash is recommended for static sites
-  trailingSlash: true,
-  // Ensure we're not generating sourcemaps in production for better performance
-  productionBrowserSourceMaps: false,
-};
+        run: pnpm install
 
-export default nextConfig;
-EOL
-          echo "✅ Updated Next.js config to ensure proper static export"
-      
-      - name: Build static site
+      - name: Build with Next.js
         working-directory: ./docs
         run: pnpm build
-      
-      - name: Check for static export
+
+      - name: Prepare static files for GitHub Pages
         working-directory: ./docs
         run: |
-          if [ -d "out" ]; then
-            echo "✅ Found 'out' directory with static export"
-            ls -la out
-            
-            # Check if index.html exists
-            if [ -f "out/index.html" ]; then
-              echo "✅ index.html exists in out directory"
-            else
-              echo "❌ index.html not found in out directory!"
-              echo "Creating a simple index.html..."
-              cat > out/index.html << 'EOL'
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0;url=./index">
-  <title>RetroZenith Builds</title>
-</head>
-<body>
-  <p>Redirecting to main page...</p>
-</body>
-</html>
-EOL
-            fi
-          else
-            echo "❌ 'out' directory not found! Creating it..."
-            mkdir -p out
-            cat > out/index.html << 'EOL'
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RetroZenith Builds</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #0f172a;
-      color: #e2e8f0;
-      text-align: center;
-    }
-    .container {
-      max-width: 800px;
-      padding: 2rem;
-    }
-    h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(to right, #3b82f6, #8b5cf6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>RetroZenith Builds</h1>
-    <p>The site is currently being deployed...</p>
-    <p>Please check back in a few minutes.</p>
-  </div>
-</body>
-</html>
-EOL
-          fi
+          # Create .nojekyll file to disable Jekyll processing
+          touch out/.nojekyll
           
-          # Add CNAME file
+          # Add CNAME file for custom domain
           echo "cdn.zenyhosting.cloud" > out/CNAME
-          echo "✅ Added CNAME file for custom domain"
           
-          echo "Final contents of out directory:"
+          # Display contents of out directory
+          echo "Contents of output directory:"
           ls -la out/
-      
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
-      
-      - name: Upload GitHub Pages artifact
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs/out
 
+  # Deployment job
   deploy:
     environment:
       name: github-pages
