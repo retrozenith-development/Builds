@@ -68,13 +68,11 @@ jobs:
         with:
           context: ./docs
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # Build for production server, not static export
-          build-args: |
-            NODE_ENV=production
 
   # You can add a deployment job for your specific hosting environment
   # Examples for common hosting platforms are included below
