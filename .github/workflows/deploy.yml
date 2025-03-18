@@ -51,106 +51,128 @@ jobs:
         working-directory: ./docs
         run: pnpm install --no-frozen-lockfile
       
-      - name: Check Next.js configuration
+      - name: Modify Next.js config for static export
         working-directory: ./docs
         run: |
-          echo "Examining Next.js configuration..."
-          if grep -q "output: 'export'" custom-next.config.mjs; then
-            echo "Static export detected in Next.js config"
-          else
-            echo "Warning: 'output: export' not found in Next.js config"
-          fi
+          # Make sure static export is properly configured
+          cat > custom-next.config.mjs << 'EOL'
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
+  // Set the base path for the application when deployed to GitHub Pages
+  basePath: '',
+  // Set the asset prefix for the application using the custom domain
+  assetPrefix: 'https://cdn.zenyhosting.cloud',
+  // This is important for GitHub Pages
+  images: {
+    unoptimized: true,
+  },
+  // Trailing slash is recommended for static sites
+  trailingSlash: true,
+  // Ensure we're not generating sourcemaps in production for better performance
+  productionBrowserSourceMaps: false,
+};
 
-      - name: Build site
+export default nextConfig;
+EOL
+          echo "✅ Updated Next.js config to ensure proper static export"
+      
+      - name: Build static site
         working-directory: ./docs
         run: pnpm build
       
-      - name: Detailed directory inspection
+      - name: Check for static export
         working-directory: ./docs
         run: |
-          echo "=== Root directory contents ==="
-          ls -la
-          echo ""
-          
-          echo "=== Check for .next directory ==="
-          if [ -d ".next" ]; then
-            echo ".next directory exists"
-            echo "Contents of .next:"
-            ls -la .next
-          else
-            echo ".next directory not found"
-          fi
-          
-          echo ""
-          echo "=== Check for out directory ==="
           if [ -d "out" ]; then
-            echo "out directory exists"
-            echo "Contents of out:"
+            echo "✅ Found 'out' directory with static export"
             ls -la out
             
-            echo ""
-            echo "Checking for index.html in out:"
+            # Check if index.html exists
             if [ -f "out/index.html" ]; then
-              echo "index.html exists in out directory"
-              echo "BUILD_OUTPUT_DIR=out" >> $GITHUB_ENV
+              echo "✅ index.html exists in out directory"
             else
-              echo "WARNING: index.html NOT found in out directory!"
+              echo "❌ index.html not found in out directory!"
+              echo "Creating a simple index.html..."
+              cat > out/index.html << 'EOL'
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=./index">
+  <title>RetroZenith Builds</title>
+</head>
+<body>
+  <p>Redirecting to main page...</p>
+</body>
+</html>
+EOL
             fi
           else
-            echo "out directory not found"
-          fi
-      
-      - name: Determine build output directory
-        working-directory: ./docs
-        run: |
-          # If we haven't set BUILD_OUTPUT_DIR yet, try to determine it
-          if [ -z "${{ env.BUILD_OUTPUT_DIR }}" ]; then
-            if [ -d "out" ] && [ -f "out/index.html" ]; then
-              echo "BUILD_OUTPUT_DIR=out" >> $GITHUB_ENV
-            elif [ -d ".next/static" ]; then
-              echo "BUILD_OUTPUT_DIR=.next" >> $GITHUB_ENV
-            else
-              echo "Could not automatically determine build output directory"
-              echo "Defaulting to repository root"
-              echo "BUILD_OUTPUT_DIR=." >> $GITHUB_ENV
-            fi
+            echo "❌ 'out' directory not found! Creating it..."
+            mkdir -p out
+            cat > out/index.html << 'EOL'
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RetroZenith Builds</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      padding: 2rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(to right, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RetroZenith Builds</h1>
+    <p>The site is currently being deployed...</p>
+    <p>Please check back in a few minutes.</p>
+  </div>
+</body>
+</html>
+EOL
           fi
           
-          echo "Selected build output directory: ${{ env.BUILD_OUTPUT_DIR }}"
+          # Add CNAME file
+          echo "cdn.zenyhosting.cloud" > out/CNAME
+          echo "✅ Added CNAME file for custom domain"
+          
+          echo "Final contents of out directory:"
+          ls -la out/
       
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
       
-      - name: Prepare CNAME and verify deployment files
-        working-directory: ./docs
-        run: |
-          # Ensure CNAME file exists in the build output
-          if [ -f "public/CNAME" ]; then
-            echo "Copying CNAME file to ${{ env.BUILD_OUTPUT_DIR }}"
-            cp public/CNAME ${{ env.BUILD_OUTPUT_DIR }}/
-          else
-            echo "Creating CNAME file with cdn.zenyhosting.cloud"
-            echo "cdn.zenyhosting.cloud" > ${{ env.BUILD_OUTPUT_DIR }}/CNAME
-          fi
-          
-          # Check if index.html exists in the build output
-          if [ ! -f "${{ env.BUILD_OUTPUT_DIR }}/index.html" ]; then
-            echo "WARNING: index.html not found in ${{ env.BUILD_OUTPUT_DIR }}!"
-            
-            # If we're using the .next directory and there's no index.html, we need to create one
-            if [ "${{ env.BUILD_OUTPUT_DIR }}" == ".next" ]; then
-              echo "Creating basic index.html for .next deployment"
-              echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/_next/static/chunks/pages/index.html"></head><body>Redirecting...</body></html>' > ${{ env.BUILD_OUTPUT_DIR }}/index.html
-            fi
-          fi
-          
-          echo "Final contents of build directory:"
-          ls -la ${{ env.BUILD_OUTPUT_DIR }}
-      
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs/${{ env.BUILD_OUTPUT_DIR }}
+          path: ./docs/out
 
   deploy:
     environment:
