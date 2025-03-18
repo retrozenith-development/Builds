@@ -8,13 +8,13 @@ RUN corepack enable && corepack prepare pnpm@8 --activate
 WORKDIR /app
 
 # Copy package.json and pnpm-lock.yaml
-COPY docs/package.json docs/pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # Copy application code
-COPY docs/ .
+COPY . .
 
 # Build the application
 RUN pnpm build
