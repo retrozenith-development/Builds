@@ -8,7 +8,7 @@ RUN corepack enable && corepack prepare pnpm@8 --activate
 WORKDIR /app
 
 # Copy docs files
-COPY docs/ /app/
+COPY ./ /app/
 
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
