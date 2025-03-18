@@ -1,4 +1,4 @@
-name: Deploy Next.js to GitHub Pages
+name: Build and Deploy Docker Image
 
 on:
   # Runs on pushes targeting the default branch
@@ -23,83 +23,72 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Build job
-  build:
+  docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
       
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          version: 8
-          run_install: false
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Restore Next.js cache
-        uses: actions/cache@v4
+          images: ghcr.io/${{ github.repository }}/retrozenith-builds
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+            latest
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
-          path: |
-            docs/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('docs/**.[jt]s', 'docs/**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
+          context: ./docs
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Install dependencies
-        working-directory: ./docs
-        run: pnpm install
+  # You can add a deployment job for your specific hosting environment
+  # Examples for common hosting platforms are included below
+  
+  # Example for deploying to a server via SSH
+  # deploy-ssh:
+  #   runs-on: ubuntu-latest
+  #   needs: docker
+  #   steps:
+  #     - name: Deploy via SSH
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.SSH_HOST }}
+  #         username: ${{ secrets.SSH_USERNAME }}
+  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
+  #         script: |
+  #           docker pull ghcr.io/${{ github.repository }}/retrozenith-builds:latest
+  #           docker-compose -f /path/to/docker-compose.yml up -d
 
-      - name: Build with Next.js
-        working-directory: ./docs
-        run: pnpm build
-
-      - name: Prepare static files for GitHub Pages
-        working-directory: ./docs
-        run: |
-          # Create .nojekyll file to disable Jekyll processing
-          touch out/.nojekyll
-          
-          # Add CNAME file for custom domain
-          echo "cdn.zenyhosting.cloud" > out/CNAME
-          
-          # Display contents of out directory
-          echo "Contents of output directory:"
-          ls -la out/
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./docs/out
-
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4 
+  # Example for deploying to a cloud platform like Digital Ocean App Platform
+  # deploy-digital-ocean:
+  #   runs-on: ubuntu-latest
+  #   needs: docker
+  #   steps:
+  #     - name: Install doctl
+  #       uses: digitalocean/action-doctl@v2
+  #       with:
+  #         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+  #     
+  #     - name: Update deployment
+  #       run: doctl apps update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec /path/to/app-spec.yaml 
