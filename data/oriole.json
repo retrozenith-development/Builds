@@ -1,0 +1,29 @@
+{
+    "response": [
+      {
+        "maintainer": "retrozenith",
+        "oem": "Google",
+        "device": "Pixel 6 (oriole)",
+        "filename": "crDroidAndroid-15.0-20250318-oriole-v11.2.zip",
+        "download": "https://github.com/retrozenith-development/Builds/releases/download/oriole-v11.2-20250318-2141/crDroidAndroid-15.0-20250318-oriole-v11.2.zip",
+        "timestamp": 1742326148,
+        "md5": "a14b39ad324960587a069466cae7f246",
+        "sha256": "e15b65c5e5ed158c8c710772a7dfcd2d3872b930e1ed95f96e60d8b3cfb69168",
+        "size": 1597338822,
+        "version": "11.2",
+        "buildtype": "Stable",
+        "forum": "",
+        "gapps": "https://sourceforge.net/projects/nikgapps/files/Elite-Releases/crdroid-official/Android-15/",
+        "firmware": "",
+        "modem": "",
+        "bootloader": "",
+        "recovery": "https://github.com/retrozenith-development/Builds/releases/tag/oriole-v11.2-20250318-1832",
+        "paypal": "https://paypal.me/retrozenith",
+        "telegram": "https://t.me/glikchedaosp",
+        "dt": "https://github.com/retrozenith-development/android_device_google_raviole",
+        "common-dt": "https://github.com/retrozenith-development/android_device_google_gs101",
+        "kernel": "https://android.googlesource.com/device/google/raviole-kernels/5.10"
+      }
+    ]
+  }
+  
