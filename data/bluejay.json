@@ -1,0 +1,29 @@
+{
+    "response": [
+      {
+        "maintainer": "retrozenith",
+        "oem": "Google",
+        "device": "Pixel 6a (bluejay)",
+        "filename": "crDroidAndroid-15.0-20250319-bluejay-v11.2.zip",
+        "download": "https://github.com/retrozenith-development/Builds/releases/download/bluejay-v11.2-20250319-1206/crDroidAndroid-15.0-20250319-bluejay-v11.2.zip",
+        "timestamp": 1742382858,
+        "md5": "31ddb1877689b96d9c0a4bf81bd6b121",
+        "sha256": "574cb9a4b300d71dc0a2408cfa58d4b319df7be434bd1f0b4641e71fb66eb5e6",
+        "size": 1599194982,
+        "version": "11.2",
+        "buildtype": "Stable",
+        "forum": "",
+        "gapps": "https://sourceforge.net/projects/nikgapps/files/Elite-Releases/crdroid-official/Android-15/",
+        "firmware": "",
+        "modem": "",
+        "bootloader": "",
+        "recovery": "https://github.com/retrozenith-development/Builds/releases/tag/bluejay-v11.2-20250319-1206",
+        "paypal": "https://paypal.me/retrozenith",
+        "telegram": "https://t.me/glikchedaosp",
+        "dt": "https://github.com/retrozenith-development/android_device_google_bluejay",
+        "common-dt": "https://github.com/retrozenith-development/android_device_google_gs101",
+        "kernel": "https://android.googlesource.com/device/google/bluejay-kernels/5.10"
+      }
+    ]
+  }
+  
