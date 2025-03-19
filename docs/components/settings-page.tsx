@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const [customDevice, setCustomDevice] = useState("")
   const [customDevices, setCustomDevices] = useState<string[]>([])
   const [deviceAdded, setDeviceAdded] = useState(false)
-  const defaultUrl = "https://cdn.jsdelivr.net/gh/crdroidandroid/android_vendor_crDroidOTA@15.0"
+  const defaultUrl = "https://cdn.jsdelivr.net/gh/retrozenith-development/Builds@main/data"
   const baseUrl = useMemo(() => getAppBaseUrl(), [])
 
   useEffect(() => {

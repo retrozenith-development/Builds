@@ -8,9 +8,9 @@ function getBaseUrl(): string {
     if (savedUrl) return savedUrl
 
     // Default URL using jsDelivr CDN
-    return "https://cdn.jsdelivr.net/gh/crdroidandroid/android_vendor_crDroidOTA@14.0"
+    return "https://cdn.jsdelivr.net/gh/retrozenith-development/Builds@main/data"
   }
-  return "https://cdn.jsdelivr.net/gh/crdroidandroid/android_vendor_crDroidOTA@14.0"
+  return "https://cdn.jsdelivr.net/gh/retrozenith-development/Builds@main/data"
 }
 
 // Get the application base URL for assets and links
@@ -146,55 +146,28 @@ export async function fetchAllRoms(): Promise<RomInfo[]> {
 function getMockRoms(): RomInfo[] {
   return [
     {
-      maintainer: "TestaMic",
-      oem: "Samsung",
-      device: "Galaxy A52",
-      filename: "crDroidAndroid-15.0-20250211-a52q-v11.2.zip",
-      download:
-        "https://sourceforge.net/projects/crdroid/files/a52q/11.x/crDroidAndroid-15.0-20250211-a52q-v11.2.zip/download",
-      timestamp: 1739282626,
-      md5: "bd6e0af71d3d71c5c68ef5c16f920b14",
-      sha256: "e3eb66d8ca21828ab9a5eb4b6918870bb2f1e440fee1f011373dbc169e834137",
-      size: 1463290607,
-      version: "11.2",
-      buildtype: "Monthly",
-      forum: "https://xdaforums.com/t/crdroid-11-1-stable-android-15-qpr1-for-a52-4g-a52q-unofficial.4672356/",
-      gapps:
-        "https://github.com/MindTheGapps/15.0.0-arm64/releases/download/MindTheGapps-15.0.0-arm64-20240928_150548/MindTheGapps-15.0.0-arm64-20240928_150548.zip",
-      firmware: "",
-      modem: "",
-      bootloader: "",
-      recovery: "https://sourceforge.net/projects/crdroid/files/a52q/11.x/recovery20251102.tar/download",
-      paypal: "https://paypal.me/FilipCojocaru",
-      telegram: "https://t.me/testamic2",
-      dt: "https://github.com/crdroidandroid/android_device_samsung_a52q",
-      "common-dt": "https://github.com/crdroidandroid/android_device_samsung_sm7125-common",
-      kernel: "https://github.com/crdroidandroid/android_kernel_samsung_sm7125",
-    },
-    {
-      maintainer: "DevUser",
-      oem: "Google",
-      device: "Pixel 7",
-      filename: "crDroidAndroid-15.0-20250210-pixel7-v11.2.zip",
-      download: "https://example.com/download/pixel7.zip",
-      timestamp: 1739182626,
-      md5: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
-      sha256: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
-      size: 1563290607,
-      version: "11.2",
-      buildtype: "Stable",
-      forum: "https://example.com/pixel7-thread",
-      gapps:
-        "https://github.com/MindTheGapps/15.0.0-arm64/releases/download/MindTheGapps-15.0.0-arm64-20240928_150548/MindTheGapps-15.0.0-arm64-20240928_150548.zip",
-      firmware: "",
-      modem: "",
-      bootloader: "",
-      recovery: "https://example.com/recovery.img",
-      paypal: "https://paypal.me/devuser",
-      telegram: "https://t.me/devuser",
-      dt: "https://github.com/crdroidandroid/android_device_google_pixel7",
-      "common-dt": "https://github.com/crdroidandroid/android_device_google_common",
-      kernel: "https://github.com/crdroidandroid/android_kernel_google_pixel7",
+      "maintainer": "retrozenith",
+      "oem": "Google",
+      "device": "Pixel 6 (oriole)",
+      "filename": "crDroidAndroid-15.0-20250318-oriole-v11.2.zip",
+      "download": "https://github.com/retrozenith-development/Builds/releases/download/oriole-v11.2-20250318-2141/crDroidAndroid-15.0-20250318-oriole-v11.2.zip",
+      "timestamp": 1742326148,
+      "md5": "a14b39ad324960587a069466cae7f246",
+      "sha256": "e15b65c5e5ed158c8c710772a7dfcd2d3872b930e1ed95f96e60d8b3cfb69168",
+      "size": 1597338822,
+      "version": "11.2",
+      "buildtype": "Stable",
+      "forum": "",
+      "gapps": "https://sourceforge.net/projects/nikgapps/files/Elite-Releases/crdroid-official/Android-15/",
+      "firmware": "",
+      "modem": "",
+      "bootloader": "",
+      "recovery": "https://github.com/retrozenith-development/Builds/releases/tag/oriole-v11.2-20250318-2141",
+      "paypal": "https://paypal.me/retrozenith",
+      "telegram": "https://t.me/glikchedaosp",
+      "dt": "https://github.com/retrozenith-development/android_device_google_raviole",
+      "common-dt": "https://github.com/retrozenith-development/android_device_google_gs101",
+      "kernel": "https://android.googlesource.com/device/google/raviole-kernels/5.10",
     },
   ]
 }
