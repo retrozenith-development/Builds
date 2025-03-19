@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  website:
+    build:
+      context: ./docs
+      dockerfile: Dockerfile
+    image: retrozenith-builds:latest
+    container_name: retrozenith-builds
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    # Uncomment these lines if you need volumes for persistent data
+    # volumes:
+    #   - ./data:/app/data 
