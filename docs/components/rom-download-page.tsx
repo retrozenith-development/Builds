@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import styles from "./rom-download-page.module.css"
-import { Download, Github, MessageCircle, CreditCard, FileCheck, Settings, RefreshCw } from "lucide-react"
+import { Download, Github, MessageCircle, CreditCard, FileCheck, Settings, RefreshCw, Smartphone } from "lucide-react"
 import { ThemeSwitcher } from "./theme-switcher"
 import Link from "next/link"
 import { fetchAllRoms, type RomInfo, getAppBaseUrl } from "@/utils/api"
@@ -180,6 +180,11 @@ export default function RomDownloadPage() {
           <span>Verify File Integrity</span>
         </Link>
 
+        <Link href="/install/gs101/" className={styles.verifyLink}>
+          <Smartphone size={18} />
+          <span>Installation Guide</span>
+        </Link>
+
         <Link href="/settings/" className={styles.settingsLink}>
           <Settings size={18} />
           <span>Settings</span>
@@ -293,10 +298,21 @@ export default function RomDownloadPage() {
                       <span>Donate</span>
                     </a>
                   )}
-                  <Link href={`/verify/?md5=${rom.md5}&device=${rom.device}`} className={styles.linkButton}>
+                  <Link
+                    href={`/verify/?md5=${rom.md5}&device=${rom.device}`}
+                    className={styles.linkButton}
+                    prefetch={false}
+                  >
                     <FileCheck size={18} />
                     <span>Verify Integrity</span>
                   </Link>
+                  {/* Add installation guide link */}
+                  {rom.device.includes("oriole") || rom.device.includes("raven") || rom.device.includes("bluejay") ? (
+                    <Link href="/install/gs101/" className={styles.linkButton} prefetch={false}>
+                      <Smartphone size={18} />
+                      <span>Installation Guide</span>
+                    </Link>
+                  ) : null}
                 </div>
               </div>
             </div>
