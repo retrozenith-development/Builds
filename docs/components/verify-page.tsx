@@ -4,35 +4,37 @@ import type React from "react"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { ThemeSwitcher } from "./theme-switcher"
-import { ArrowLeft, FileCheck, AlertTriangle, Upload, Copy, Check, Settings } from "lucide-react"
+import { ArrowLeft, FileCheck, AlertTriangle, Upload, Copy, Check, Settings, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import styles from "./verify-page.module.css"
 import { calculateFileMD5 } from "@/utils/md5"
 import { fetchAllRoms, type RomInfo, getAppBaseUrl } from "@/utils/api"
-import { useSearchParams } from "next/navigation"
 
-export default function VerifyPage() {
+interface VerifyPageProps {
+  initialMd5: string | null
+  initialDevice: string | null
+}
+
+export default function VerifyPage({ initialMd5, initialDevice }: VerifyPageProps) {
   const [roms, setRoms] = useState<RomInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [md5Input, setMd5Input] = useState("")
+  const [md5Input, setMd5Input] = useState(initialMd5 || "")
   const [calculatedMd5, setCalculatedMd5] = useState("")
   const [fileName, setFileName] = useState("")
   const [fileSize, setFileSize] = useState(0)
   const [isCalculating, setIsCalculating] = useState(false)
+  const [calculationProgress, setCalculationProgress] = useState(0)
   const [matchResult, setMatchResult] = useState<{
     matches: boolean
     rom?: RomInfo
   } | null>(null)
   const [copied, setCopied] = useState(false)
+  const [fileError, setFileError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const searchParams = useSearchParams()
   const isMounted = useRef(true)
   const [contentReady, setContentReady] = useState(false)
   const dataFetchedRef = useRef(false)
-
-  // Extract md5 param once and store it in a ref to avoid re-renders
-  const md5Param = useMemo(() => searchParams.get("md5"), [])
   const baseUrl = useMemo(() => getAppBaseUrl(), [])
 
   // Memoize the checkForMatches function to prevent recreating it on every render
@@ -72,9 +74,9 @@ export default function VerifyPage() {
         setError(null)
 
         // Check if there's an MD5 in the URL params
-        if (md5Param) {
-          setMd5Input(md5Param)
-          checkForMatches(md5Param, data)
+        if (initialMd5) {
+          setMd5Input(initialMd5)
+          checkForMatches(initialMd5, data)
         }
 
         // Ensure loading state shows for at least 500ms to prevent flickering
@@ -123,16 +125,24 @@ export default function VerifyPage() {
     }
 
     loadRoms()
-  }, []) // Empty dependency array - only run once on mount
+  }, [initialMd5, checkForMatches]) // Include initialMd5 in dependencies
 
   // Function to calculate MD5 hash of a file
   const calculateMD5 = useCallback(
     async (file: File) => {
       setIsCalculating(true)
+      setCalculationProgress(0)
       setFileName(file.name)
       setFileSize(file.size)
+      setFileError(null)
 
       try {
+        // Check file size and warn if it's very large
+        if (file.size > 1024 * 1024 * 1024) {
+          // 1GB
+          console.warn("Very large file detected. This may take some time:", file.size)
+        }
+
         const hash = await calculateFileMD5(file)
 
         // Only update state if component is still mounted
@@ -140,6 +150,7 @@ export default function VerifyPage() {
 
         setCalculatedMd5(hash)
         setIsCalculating(false)
+        setCalculationProgress(100)
 
         // Check for matches
         checkForMatches(hash, roms)
@@ -150,6 +161,21 @@ export default function VerifyPage() {
         if (!isMounted.current) return
 
         setIsCalculating(false)
+        setCalculationProgress(0)
+
+        // Check if it's an out of memory error
+        if (
+          error instanceof Error &&
+          (error.message.includes("out of memory") ||
+            error.message.includes("OOM") ||
+            error.message.includes("allocation failed"))
+        ) {
+          setFileError(
+            "Out of Memory error: The file is too large to process in the browser. Please try using the manual verification method with the MD5 hash instead.",
+          )
+        } else {
+          setFileError(`Failed to calculate hash: ${error instanceof Error ? error.message : "Unknown error"}`)
+        }
       }
     },
     [roms, checkForMatches],
@@ -287,6 +313,21 @@ export default function VerifyPage() {
               <div className={styles.calculating}>
                 <div className={styles.spinner}></div>
                 <p>Calculating MD5 hash...</p>
+                {fileSize > 500 * 1024 * 1024 && (
+                  <p className={styles.largeFileWarning}>
+                    Large file detected ({formatFileSize(fileSize)}). This may take some time.
+                  </p>
+                )}
+                <div className={styles.progressContainer}>
+                  <div className={styles.progressBar} style={{ width: `${calculationProgress}%` }}></div>
+                </div>
+              </div>
+            )}
+
+            {fileError && (
+              <div className={styles.fileError}>
+                <AlertCircle size={20} />
+                <p>{fileError}</p>
               </div>
             )}
 
@@ -339,6 +380,24 @@ export default function VerifyPage() {
                 Verify
               </button>
             </div>
+
+            {fileError && (
+              <div className={styles.manualVerifyTip}>
+                <p>
+                  <strong>Tip:</strong> For large files, you can calculate the MD5 hash using external tools:
+                </p>
+                <div className={styles.commandExamples}>
+                  <div>
+                    <strong>Windows (PowerShell):</strong>
+                    <pre>Get-FileHash -Algorithm MD5 -Path "path\to\file.zip"</pre>
+                  </div>
+                  <div>
+                    <strong>macOS/Linux:</strong>
+                    <pre>md5sum path/to/file.zip</pre>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {matchResult && (

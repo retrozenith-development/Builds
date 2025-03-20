@@ -441,6 +441,74 @@
   color: var(--text-secondary);
 }
 
+.progressContainer {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background: linear-gradient(to right, var(--primary-color), var(--primary-light));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.fileError {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  background-color: rgba(255, 87, 34, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 87, 34, 0.3);
+}
+
+.fileError svg {
+  color: #ff5722;
+  flex-shrink: 0;
+}
+
+.largeFileWarning {
+  color: #ffc107;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.manualVerifyTip {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: rgba(33, 150, 243, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.commandExamples {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.commandExamples div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.commandExamples pre {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .themeSwitcherContainer {

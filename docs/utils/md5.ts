@@ -1,53 +1,52 @@
-// A simple MD5 implementation for client-side use
-// Note: In a production environment, you might want to use a more robust library
+import SparkMD5 from "spark-md5"
 
-function md5(input: string): string {
-  // This is a simplified implementation for demonstration purposes
-  // In a real app, you would use a proper MD5 library like crypto-js
-
-  // For now, we'll just return a mock function that creates a hash-like string
-  // based on the input to simulate the behavior
-  let hash = ""
-  const characters = "abcdef0123456789"
-
-  // Use the input string to seed our "hash"
-  let seed = 0
-  for (let i = 0; i < input.length; i++) {
-    seed += input.charCodeAt(i)
-  }
-
-  // Generate a 32-character hex string
-  for (let i = 0; i < 32; i++) {
-    const index = (seed + i) % characters.length
-    hash += characters[index]
-  }
-
-  return hash
-}
-
-// Function to calculate MD5 of a file
+// Function to calculate MD5 of a file using SparkMD5 (browser-compatible)
 export async function calculateFileMD5(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
+    // Create a file reader
     const reader = new FileReader()
+    const spark = new SparkMD5.ArrayBuffer()
 
-    reader.onload = (event) => {
-      try {
-        const result = event.target?.result as string
-        // In a real implementation, we would use a proper MD5 algorithm
-        // For demo purposes, we'll use our simplified function
-        const hash = md5(result)
-        resolve(hash)
-      } catch (error) {
-        reject(error)
-      }
+    // Define chunk size (2MB)
+    const chunkSize = 2 * 1024 * 1024
+    let currentChunk = 0
+    const chunks = Math.ceil(file.size / chunkSize)
+
+    // Function to load the next chunk
+    const loadNext = () => {
+      const start = currentChunk * chunkSize
+      const end = Math.min(start + chunkSize, file.size)
+
+      reader.readAsArrayBuffer(file.slice(start, end))
     }
 
+    // Error handler
     reader.onerror = (error) => {
+      console.error("Error reading file:", error)
       reject(error)
     }
 
-    // Read the file as text
-    reader.readAsText(file)
+    // On chunk load
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        // Add chunk to spark
+        spark.append(e.target.result as ArrayBuffer)
+
+        currentChunk++
+
+        if (currentChunk < chunks) {
+          // Load next chunk
+          loadNext()
+        } else {
+          // All chunks loaded, return the MD5 hash
+          const hash = spark.end()
+          resolve(hash)
+        }
+      }
+    }
+
+    // Start loading the first chunk
+    loadNext()
   })
 }
 
