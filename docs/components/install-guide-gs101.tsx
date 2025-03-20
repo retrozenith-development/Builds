@@ -223,7 +223,7 @@ export default function InstallGuideGS101() {
                 </li>
                 <li>
                   Flash recovery images and kernel (replace [vendor_boot.img], [dtbo.img], [boot.img] with the actual filename):
-                  <div className={styles.command}>fastboot flash [vendor_boot.img]</div>
+                  <div className={styles.command}>fastboot flash vendor_boot [vendor_boot.img]</div>
                   <div className={styles.command}>fastboot flash boot [boot.img]</div>
                   <div className={styles.command}>fastboot flash dtbo [dtbo.img]</div>
                 </li>
