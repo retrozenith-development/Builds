@@ -8,6 +8,8 @@ import { Download, Github, MessageCircle, CreditCard, FileCheck, Settings, Refre
 import { ThemeSwitcher } from "./theme-switcher"
 import Link from "next/link"
 import { fetchAllRoms, type RomInfo, getAppBaseUrl } from "@/utils/api"
+// Add import for the TerminalLoader component
+import TerminalLoader from "./terminal-loader"
 
 export default function RomDownloadPage() {
   const [roms, setRoms] = useState<RomInfo[]>([])
@@ -142,8 +144,7 @@ export default function RomDownloadPage() {
     return (
       <PageShell>
         <div className={styles.loadingContainer}>
-          <div className={styles.spinner}></div>
-          <p>Loading ROM information...</p>
+          <TerminalLoader text="Loading ROMs..." />
         </div>
       </PageShell>
     )

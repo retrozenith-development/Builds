@@ -9,6 +9,8 @@ import Link from "next/link"
 import styles from "./verify-page.module.css"
 import { calculateFileMD5 } from "@/utils/md5"
 import { fetchAllRoms, type RomInfo, getAppBaseUrl } from "@/utils/api"
+// Add import for the TerminalLoader component
+import TerminalLoader from "./terminal-loader"
 
 interface VerifyPageProps {
   initialMd5: string | null
@@ -143,7 +145,10 @@ export default function VerifyPage({ initialMd5, initialDevice }: VerifyPageProp
           console.warn("Very large file detected. This may take some time:", file.size)
         }
 
-        const hash = await calculateFileMD5(file)
+        const hash = await calculateFileMD5(file, (progress) => {
+          // Update progress state
+          setCalculationProgress(progress)
+        })
 
         // Only update state if component is still mounted
         if (!isMounted.current) return
@@ -270,8 +275,7 @@ export default function VerifyPage({ initialMd5, initialDevice }: VerifyPageProp
     return (
       <PageShell>
         <div className={styles.loadingContainer}>
-          <div className={styles.spinner}></div>
-          <p>Loading ROM information...</p>
+          <TerminalLoader text="Loading ROM data..." />
         </div>
       </PageShell>
     )
@@ -311,8 +315,7 @@ export default function VerifyPage({ initialMd5, initialDevice }: VerifyPageProp
 
             {isCalculating && (
               <div className={styles.calculating}>
-                <div className={styles.spinner}></div>
-                <p>Calculating MD5 hash...</p>
+                <TerminalLoader text="Calculating MD5..." />
                 {fileSize > 500 * 1024 * 1024 && (
                   <p className={styles.largeFileWarning}>
                     Large file detected ({formatFileSize(fileSize)}). This may take some time.

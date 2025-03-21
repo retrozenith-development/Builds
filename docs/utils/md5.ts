@@ -1,7 +1,7 @@
 import SparkMD5 from "spark-md5"
 
 // Function to calculate MD5 of a file using SparkMD5 (browser-compatible)
-export async function calculateFileMD5(file: File): Promise<string> {
+export async function calculateFileMD5(file: File, onProgress?: (progress: number) => void): Promise<string> {
   return new Promise((resolve, reject) => {
     // Create a file reader
     const reader = new FileReader()
@@ -33,6 +33,12 @@ export async function calculateFileMD5(file: File): Promise<string> {
         spark.append(e.target.result as ArrayBuffer)
 
         currentChunk++
+
+        // Report progress
+        if (onProgress) {
+          const progress = Math.round((currentChunk / chunks) * 100)
+          onProgress(progress)
+        }
 
         if (currentChunk < chunks) {
           // Load next chunk
