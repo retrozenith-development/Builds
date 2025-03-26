@@ -22,7 +22,7 @@
         "telegram": "https://t.me/glikchedaosp",
         "dt": "https://github.com/retrozenith-development/android_device_google_raviole",
         "common-dt": "https://github.com/retrozenith-development/android_device_google_gs101",
-        "kernel": "https://android.googlesource.com/device/google/raviole-kernels/5.10"
+        "kernel": "https://android.googlesource.com/device/google/raviole-kernels/6.1"
       }
     ]
   }
