@@ -127,9 +127,6 @@ export default function SettingsPage() {
                 Default URL: <code>{defaultUrl}</code>
               </p>
               <p>This URL should point to a repository containing device JSON files.</p>
-              <p className={styles.note}>
-                Note: Due to CORS restrictions, direct GitHub raw URLs won't work. Use a CORS-enabled CDN like jsDelivr.
-              </p>
             </div>
           </div>
 

@@ -8,9 +8,9 @@ function getBaseUrl(): string {
     if (savedUrl) return savedUrl
 
     // Default URL using jsDelivr CDN
-    return "https://cdn.jsdelivr.net/gh/retrozenith-development/Builds@main/data"
+    return "https://raw.githubusercontent.com/retrozenith-development/Builds/refs/heads/main/data"
   }
-  return "https://cdn.jsdelivr.net/gh/retrozenith-development/Builds@main/data"
+  return "https://raw.githubusercontent.com/retrozenith-development/Builds/refs/heads/main/data"
 }
 
 // Get the application base URL for assets and links
